@@ -19,8 +19,6 @@ pageextension 50039 "CustomerListExtXML" extends "Customer List"
                     InStream: InStream;
                     FileName: Text;
                 begin
-                    // Set the file name
-                    FileName := 'Customers.xml';
 
                     // Create an OutStream from TempBlob
                     TempBlob.CreateOutStream(OutStream);
@@ -34,10 +32,15 @@ pageextension 50039 "CustomerListExtXML" extends "Customer List"
                     // Create an InStream from TempBlob
                     TempBlob.CreateInStream(InStream);
 
+                    // Set the file name
+                    FileName := 'Customers.xml';
+
                     // Download the file using FileManagement.BLOBExport
                     FileManagement.BLOBExport(TempBlob, FileName, true);
                 end;
             }
         }
     }
+    var
+        myInt: Integer;
 }

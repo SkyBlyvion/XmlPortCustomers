@@ -44,7 +44,10 @@ xmlport 50038 "CustomerExport"
             {
                 group(FilterGroup)
                 {
-                    field(Name; Customer."Name") { }
+                    field(Name; Customer."Name")
+                    {
+                        ApplicationArea = All;
+                    }
                 }
             }
         }
