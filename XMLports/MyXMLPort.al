@@ -1,7 +1,7 @@
-xmlport 50038 "CustomerExport"
+xmlport 50038 "CustomerExportImport"
 {
-    Caption = 'Customer Export';
-    Direction = Export;
+    Caption = 'Customer Export/Import';
+    Direction = Both;
     Format = Xml;
 
     schema
@@ -13,18 +13,10 @@ xmlport 50038 "CustomerExport"
             {
                 RequestFilterFields = "No.";
                 XmlName = 'Customer';
-                fieldattribute(No; Customer."No.")
-                {
-                }
-                fieldattribute(Name; Customer.Name)
-                {
-                }
-                fieldattribute(PhoneNo; Customer."Phone No.")
-                {
-                }
-                fieldattribute(Email; Customer."E-Mail")
-                {
-                }
+                fieldattribute(No; Customer."No.") { }
+                fieldattribute(Name; Customer.Name) { }
+                fieldattribute(PhoneNo; Customer."Phone No.") { }
+                fieldattribute(Email; Customer."E-Mail") { }
                 textelement(Address)
                 {
                     XmlName = 'Address';
@@ -52,4 +44,29 @@ xmlport 50038 "CustomerExport"
             }
         }
     }
+
+    var
+        TempCustomer: Record Customer;
+
+    trigger OnPreXmlPort()
+    begin
+        // Code to run before XMLPort processing starts
+        if Customer.Get(Customer."No.") then begin
+            TempCustomer := Customer;
+        end;
+    end;
+
+    trigger OnPostXmlPort()
+    begin
+        // This runs after the XMLPort processing is complete
+        if TempCustomer."No." <> '' then begin
+            TempCustomer.Name := Customer.Name;
+            TempCustomer."Phone No." := Customer."Phone No.";
+            TempCustomer."E-Mail" := Customer."E-Mail";
+            TempCustomer.Address := Customer.Address;
+            TempCustomer."Post Code" := Customer."Post Code";
+            TempCustomer.City := Customer.City;
+            TempCustomer.Modify();
+        end;
+    end;
 }

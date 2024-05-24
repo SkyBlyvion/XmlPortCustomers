@@ -12,22 +12,21 @@ pageextension 50039 "CustomerListExtXML" extends "Customer List"
                 Image = ExportContact;
                 trigger OnAction()
                 var
-                    FileManagement: Codeunit "File Management";
                     TempBlob: Codeunit "Temp Blob";
-                    CustomerExportHandler: Xmlport "CustomerExport";
+                    FileManagement: Codeunit "File Management";
+                    CustomerExportImportHandler: Xmlport "CustomerExportImport";
                     OutStream: OutStream;
                     InStream: InStream;
                     FileName: Text;
                 begin
-
                     // Create an OutStream from TempBlob
                     TempBlob.CreateOutStream(OutStream);
 
                     // Set the destination OutStream for the XmlPort
-                    CustomerExportHandler.SetDestination(OutStream);
+                    CustomerExportImportHandler.SetDestination(OutStream);
 
                     // Run the XmlPort to export data to the OutStream
-                    CustomerExportHandler.Export();
+                    CustomerExportImportHandler.Export();
 
                     // Create an InStream from TempBlob
                     TempBlob.CreateInStream(InStream);
@@ -39,8 +38,33 @@ pageextension 50039 "CustomerListExtXML" extends "Customer List"
                     FileManagement.BLOBExport(TempBlob, FileName, true);
                 end;
             }
+
+            action(ImportCustomers)
+            {
+                ApplicationArea = All;
+                Caption = 'Import Customers from XML';
+                ToolTip = 'Import Customers from XML';
+                Image = Import;
+                trigger OnAction()
+                var
+                    TempBlob: Codeunit "Temp Blob";
+                    FileManagement: Codeunit "File Management";
+                    CustomerExportImportHandler: Xmlport "CustomerExportImport";
+                    InStream: InStream;
+                begin
+                    // Upload the XML file and store it in TempBlob
+                    FileManagement.BLOBImport(TempBlob, 'Import Customers');
+
+                    // Create an InStream from TempBlob
+                    TempBlob.CreateInStream(InStream);
+
+                    // Set the source InStream for the XmlPort
+                    CustomerExportImportHandler.SetSource(InStream);
+
+                    // Run the XmlPort to import data from the InStream
+                    CustomerExportImportHandler.Import();
+                end;
+            }
         }
     }
-    var
-        myInt: Integer;
 }
